@@ -1,7 +1,9 @@
 {
     "files.associations": {
         "*.tpp": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "*.tcc": "cpp",
+        "string": "cpp"
     },
     "terminal.integrated.shell.windows": "cmd.exe",
     "C_Cpp.errorSquiggles": "disabled"

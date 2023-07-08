@@ -12,6 +12,12 @@ using namespace std;
 bool check_collision( SDL_Rect &A, SDL_Rect &B );
 int check_ligne(int nb_block[50]);
 void sup_case(int i,int &indice, block tab_block[1000]);
+void draw_forme(forme &f,SDL_Renderer* rend);
+forme init_forme(forme &f);
+void actualiser_forme(forme &f,int vitesse,int &indice,int nb_block[50],block tab_block[1000]);
+void check_colission_plateau(forme &f);
+void check_colision_block(forme &f,block tab_block[1000],int indice);
+
 
 
 
@@ -46,6 +52,12 @@ int vitesse= 1;
 bool close = false,bas = true;
 int speed = 300;
 
+
+forme f;
+
+init_forme(f);
+
+
 while (!close) {
     SDL_Event event;
     
@@ -58,20 +70,25 @@ while (!close) {
                 switch (event.key.keysym.scancode) {
                     case SDL_SCANCODE_W:
                     case SDL_SCANCODE_UP:
-                        b.dest.y -= 30;
+                    for (int i=0;i<=f.indice_tab;i++)
+                        {f.liste_block[i].dest.y -= 30;}
+                        
                         break;
                     case SDL_SCANCODE_A:
                     case SDL_SCANCODE_LEFT:
-                        b.dest.x -= 30;
+                        for (int i=0;i<=f.indice_tab;i++)
+                        {f.liste_block[i].dest.x -= 30;}
                         break;
                     case SDL_SCANCODE_S:
                     case SDL_SCANCODE_DOWN:
                     if (bas == true)
-                        {b.dest.y += 15;}
+                        {for (int i=0;i<=f.indice_tab;i++)
+                        {f.liste_block[i].dest.y += 30;}}
                         break;
                     case SDL_SCANCODE_D:
                     case SDL_SCANCODE_RIGHT:
-                        b.dest.x += 30;
+                        for (int i=0;i<=f.indice_tab;i++)
+                        {f.liste_block[i].dest.x += 30;}
                         break;
                     default:
                         break;
@@ -80,25 +97,13 @@ while (!close) {
         }
     }
     
-    if (b.dest.x + 30 > 551) {
-        b.dest.x = 549 - b.dest.w;
-    }
+     
     
-    if (b.dest.x - 30 < 250) {
-        b.dest.x = 250;
-    }
+  
+    check_colission_plateau(f);
+    actualiser_forme(f,vitesse,indice,nb_block,tab_block);
     
-    if (b.dest.y + b.dest.h > 810) {
-        b.dest.y = 810 - b.dest.h;
-        b.move=false;
 
-    }
-    
-    if (b.dest.y < 0) {
-        b.dest.y = 0;
-    }
-    
-    b.dest.y+=vitesse;
 
     SDL_SetRenderDrawColor(rend,0,0,0,255);
     SDL_RenderClear(rend);
@@ -106,12 +111,12 @@ while (!close) {
     SDL_SetRenderDrawColor(rend,255,255,255,255);
     SDL_RenderDrawRect(rend, &plateau);
 
-    SDL_SetRenderDrawColor(rend,0,0,255,255);
-    SDL_RenderDrawRect(rend, &b.dest);
+   
+    draw_forme(f,rend);
 
     
     
-
+    check_colision_block(f,tab_block, indice);
     for(int y=0;y<=indice;y++)
     {
         
@@ -136,28 +141,8 @@ while (!close) {
 
     }
 
-    if (b.move==false)
-    {
-        
-        nb_block[b.dest.y / 30] +=1;
-        b.nbLigne = b.dest.y / 30 ;
-        b.dest.y = 30  * b.nbLigne;
-        tab_block[indice]=b;
-        indice+=1;
-        
-        
-
-        bas = true;
-        block a;
-        
-        a.dest.w = 30;
-        a.dest.h = 30;
-        a.dest.x = 400;
-        a.dest.y = 150;
-        a.move=true;
-        b=a;
-    }
     
+ 
 
     int ligne = check_ligne(nb_block);
     
@@ -282,5 +267,297 @@ void sup_case(int i,int &indice, block tab_block[1000])
     {
         tab_block[y] = tab_block[y+1];
         
+    }
+}
+
+
+void draw_forme(forme &f,SDL_Renderer* rend)
+{
+    for (int i=0;i<=f.indice_tab;i++)
+    {
+        SDL_SetRenderDrawColor(rend,0,0,255,255);
+        SDL_RenderDrawRect(rend, &f.liste_block[i].dest);
+    }
+}
+
+
+forme init_forme(forme &f)
+{
+    int nb = rand()%6;
+    f.lettre = f.choix_forme[nb];
+    block g1,m1,d1,g2,m2,d2,g3,m3,d3;
+    if (f.lettre == 'L')
+    {
+        
+        g1.dest.w = 30;
+        g1.dest.h = 30;
+        g1.dest.x = 370;
+        g1.dest.y = 150;
+
+        g2.dest.w = 30;
+        g2.dest.h = 30;
+        g2.dest.x = 370;
+        g2.dest.y = 180;
+
+        g3.dest.w = 30;
+        g3.dest.h = 30;
+        g3.dest.x = 370;
+        g3.dest.y = 210;
+
+        m3.dest.w = 30;
+        m3.dest.h = 30;
+        m3.dest.x = 400;
+        m3.dest.y = 210;
+        
+        f.liste_block[0]= g1;
+        f.liste_block[1]= g2;
+        f.liste_block[2]= g3;
+        f.liste_block[3]= m3;
+
+        f.indice_tab = 3;
+    }
+    else if (f.lettre == 'O')
+    {
+        
+        g1.dest.w = 30;
+        g1.dest.h = 30;
+        g1.dest.x = 370;
+        g1.dest.y = 150;
+
+        m1.dest.w = 30;
+        m1.dest.h = 30;
+        m1.dest.x = 400;
+        m1.dest.y = 150;
+
+        g2.dest.w = 30;
+        g2.dest.h = 30;
+        g2.dest.x = 370;
+        g2.dest.y = 180;
+
+        m2.dest.w = 30;
+        m2.dest.h = 30;
+        m2.dest.x = 400;
+        m2.dest.y = 180;
+        
+        f.liste_block[0]= g1;
+        f.liste_block[1]= g2;
+        f.liste_block[2]= m1;
+        f.liste_block[3]= m2;
+
+        f.indice_tab = 3;
+    }
+    else if (f.lettre == 'T')
+    {
+        
+        g1.dest.w = 30;
+        g1.dest.h = 30;
+        g1.dest.x = 370;
+        g1.dest.y = 150;
+
+        m1.dest.w = 30;
+        m1.dest.h = 30;
+        m1.dest.x = 400;
+        m1.dest.y = 150;
+
+        d1.dest.w = 30;
+        d1.dest.h = 30;
+        d1.dest.x = 430;
+        d1.dest.y = 150;
+
+        m2.dest.w = 30;
+        m2.dest.h = 30;
+        m2.dest.x = 400;
+        m2.dest.y = 180;
+        
+        f.liste_block[0]= g1;
+        f.liste_block[1]= d1;
+        f.liste_block[2]= m1;
+        f.liste_block[3]= m2;
+
+        f.indice_tab = 3;
+    }
+    else if (f.lettre == 'Z')
+    {
+        
+        g1.dest.w = 30;
+        g1.dest.h = 30;
+        g1.dest.x = 370;
+        g1.dest.y = 150;
+
+        g2.dest.w = 30;
+        g2.dest.h = 30;
+        g2.dest.x = 370;
+        g2.dest.y = 180;
+
+        m3.dest.w = 30;
+        m3.dest.h = 30;
+        m3.dest.x = 400;
+        m3.dest.y = 210;
+
+        m2.dest.w = 30;
+        m2.dest.h = 30;
+        m2.dest.x = 400;
+        m2.dest.y = 180;
+        
+        f.liste_block[0]= g1;
+        f.liste_block[1]= g2;
+        f.liste_block[2]= m3;
+        f.liste_block[3]= m2;
+
+        f.indice_tab = 3;
+    }
+    else if (f.lettre == 'S')
+    {
+        
+        d1.dest.w = 30;
+        d1.dest.h = 30;
+        d1.dest.x = 430;
+        d1.dest.y = 150;
+
+        d2.dest.w = 30;
+        d2.dest.h = 30;
+        d2.dest.x = 430;
+        d2.dest.y = 180;
+
+        m3.dest.w = 30;
+        m3.dest.h = 30;
+        m3.dest.x = 400;
+        m3.dest.y = 210;
+
+        m2.dest.w = 30;
+        m2.dest.h = 30;
+        m2.dest.x = 400;
+        m2.dest.y = 180;
+        
+        f.liste_block[0]= d2;
+        f.liste_block[1]= d1;
+        f.liste_block[2]= m3;
+        f.liste_block[3]= m2;
+
+        f.indice_tab = 3;
+    }
+    else if (f.lettre == 'I')
+    {
+        
+        m1.dest.w = 30;
+        m1.dest.h = 30;
+        m1.dest.x = 400;
+        m1.dest.y = 150;
+
+        
+
+        m3.dest.w = 30;
+        m3.dest.h = 30;
+        m3.dest.x = 400;
+        m3.dest.y = 210;
+
+        m2.dest.w = 30;
+        m2.dest.h = 30;
+        m2.dest.x = 400;
+        m2.dest.y = 180;
+        
+        f.liste_block[0]= m1;
+        f.liste_block[1]= m2;
+        f.liste_block[2]= m3;
+        
+
+        f.indice_tab = 2;
+    }
+    
+}
+
+
+void actualiser_forme(forme &f,int vitesse,int &indice,int nb_block[50],block tab_block[1000])
+{
+    bool new_forme = false;
+    for (int i=0;i<=f.indice_tab;i++)
+        {
+            if (f.liste_block[i].move==true)
+            {
+                f.liste_block[i].dest.y+=vitesse;
+                
+            }
+            else{
+                f.liste_block[i].nbLigne = f.liste_block[i].dest.y / 30 ;
+                f.liste_block[i].dest.y = 30  * f.liste_block[i].nbLigne;
+                nb_block[f.liste_block[i].dest.y /30] +=1;
+                
+                tab_block[indice]=f.liste_block[i];
+                indice+=1;
+
+                new_forme = true;
+
+                
+            }
+        }
+        if (new_forme==true)
+        {
+            forme g;
+            
+            init_forme(g);
+            f=g;
+        }
+        
+}
+
+
+void check_colission_plateau(forme &f)
+{
+    bool droite=true,gauche=true;
+    for (int i=0;i<=f.indice_tab;i++)
+        {
+
+            if (f.liste_block[i].dest.x + 30 > 551 && droite==true) {
+                f.liste_block[i].dest.x = 549 - f.liste_block[i].dest.w;
+                
+            }
+            
+            if (f.liste_block[i].dest.x - 30 < 250 && gauche==true) {
+                f.liste_block[i].dest.x = 250;
+                
+            }
+            
+            if (f.liste_block[i].dest.y + f.liste_block[i].dest.h > 810) {
+                f.liste_block[i].dest.y = 810 - f.liste_block[i].dest.h;
+                
+                for (int y=0;y<=f.indice_tab;y++)
+                {
+                    f.liste_block[y].move = false;
+                    
+                    
+                }
+
+            }
+            
+            if (f.liste_block[i].dest.y < 0) {
+                f.liste_block[i].dest.y = 0;
+            }
+        }
+    droite=true;
+    gauche=true;
+}
+
+
+void check_colision_block(forme &f,block tab_block[1000],int indice)
+{
+    bool test=true;
+    for (int i=0;i<=f.indice_tab;i++)
+    {
+        for(int y=0;y<=indice;y++)
+        {
+            if (check_collision(f.liste_block[i].dest,tab_block[y].dest)==true)
+            {
+                test=false;
+                
+                
+            }
+        }
+    }
+    if (test==false)
+    {
+        for (int i=0;i<=f.indice_tab;i++)
+        {
+            f.liste_block[i].move=false;
+        }
     }
 }
