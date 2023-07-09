@@ -314,6 +314,16 @@ forme init_forme(forme &f)
         f.liste_block[2]= g3;
         f.liste_block[3]= m3;
 
+
+        f.liste_block[0].cote_droit = 2;
+        f.liste_block[0].cote_gauche = 0;
+        f.liste_block[1].cote_droit = 2;
+        f.liste_block[1].cote_gauche = 0;
+        f.liste_block[2].cote_droit = 2;
+        f.liste_block[2].cote_gauche = 0;
+        f.liste_block[3].cote_droit = 1;
+        f.liste_block[3].cote_gauche = 1;
+
         f.indice_tab = 3;
     }
     else if (f.lettre == 'O')
@@ -343,6 +353,15 @@ forme init_forme(forme &f)
         f.liste_block[1]= g2;
         f.liste_block[2]= m1;
         f.liste_block[3]= m2;
+
+        f.liste_block[0].cote_droit = 2;
+        f.liste_block[0].cote_gauche = 0;
+        f.liste_block[1].cote_droit = 2;
+        f.liste_block[1].cote_gauche = 0;
+        f.liste_block[2].cote_droit = 1;
+        f.liste_block[2].cote_gauche = 1;
+        f.liste_block[3].cote_droit = 1;
+        f.liste_block[3].cote_gauche = 1;
 
         f.indice_tab = 3;
     }
@@ -374,6 +393,16 @@ forme init_forme(forme &f)
         f.liste_block[2]= m1;
         f.liste_block[3]= m2;
 
+        f.liste_block[0].cote_droit = 2;
+        f.liste_block[0].cote_gauche = 0;
+        f.liste_block[1].cote_droit = 0;
+        f.liste_block[1].cote_gauche = 2;
+        f.liste_block[2].cote_droit = 1;
+        f.liste_block[2].cote_gauche = 1;
+        f.liste_block[3].cote_droit = 1;
+        f.liste_block[3].cote_gauche = 1;
+        
+
         f.indice_tab = 3;
     }
     else if (f.lettre == 'Z')
@@ -403,6 +432,15 @@ forme init_forme(forme &f)
         f.liste_block[1]= g2;
         f.liste_block[2]= m3;
         f.liste_block[3]= m2;
+
+        f.liste_block[0].cote_droit = 2;
+        f.liste_block[0].cote_gauche = 0;
+        f.liste_block[1].cote_droit = 2;
+        f.liste_block[1].cote_gauche = 0;
+        f.liste_block[2].cote_droit = 1;
+        f.liste_block[2].cote_gauche = 1;
+        f.liste_block[3].cote_droit = 1;
+        f.liste_block[3].cote_gauche = 1;
 
         f.indice_tab = 3;
     }
@@ -434,6 +472,15 @@ forme init_forme(forme &f)
         f.liste_block[2]= m3;
         f.liste_block[3]= m2;
 
+        f.liste_block[0].cote_droit = 0;
+        f.liste_block[0].cote_gauche = 2;
+        f.liste_block[1].cote_droit = 0;
+        f.liste_block[1].cote_gauche = 2;
+        f.liste_block[2].cote_droit = 1;
+        f.liste_block[2].cote_gauche = 1;
+        f.liste_block[3].cote_droit = 1;
+        f.liste_block[3].cote_gauche = 1;
+
         f.indice_tab = 3;
     }
     else if (f.lettre == 'I')
@@ -459,7 +506,14 @@ forme init_forme(forme &f)
         f.liste_block[0]= m1;
         f.liste_block[1]= m2;
         f.liste_block[2]= m3;
-        
+
+        f.liste_block[0].cote_droit = 1;
+        f.liste_block[0].cote_gauche = 1;
+        f.liste_block[1].cote_droit = 1;
+        f.liste_block[1].cote_gauche = 1;
+        f.liste_block[2].cote_droit = 1;
+        f.liste_block[2].cote_gauche = 1;
+
 
         f.indice_tab = 2;
     }
@@ -503,17 +557,17 @@ void actualiser_forme(forme &f,int vitesse,int &indice,int nb_block[50],block ta
 
 void check_colission_plateau(forme &f)
 {
-    bool droite=true,gauche=true;
+    
     for (int i=0;i<=f.indice_tab;i++)
         {
 
-            if (f.liste_block[i].dest.x + 30 > 551 && droite==true) {
-                f.liste_block[i].dest.x = 549 - f.liste_block[i].dest.w;
+            if (f.liste_block[i].dest.x + 30 > 551 ) {
+                f.liste_block[i].dest.x = 549 - f.liste_block[i].dest.w -30*f.liste_block[i].cote_droit;
                 
             }
             
-            if (f.liste_block[i].dest.x - 30 < 250 && gauche==true) {
-                f.liste_block[i].dest.x = 250;
+            if (f.liste_block[i].dest.x - 30 < 250 ) {
+                f.liste_block[i].dest.x = 250 + 30*f.liste_block[i].cote_gauche;
                 
             }
             
@@ -533,8 +587,7 @@ void check_colission_plateau(forme &f)
                 f.liste_block[i].dest.y = 0;
             }
         }
-    droite=true;
-    gauche=true;
+    
 }
 
 

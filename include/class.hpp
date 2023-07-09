@@ -7,7 +7,7 @@ public:
     int nbLigne;
     
     bool move= true;
-
+    int cote_droit,cote_gauche;
     
     block(/* args */);
     ~block();
