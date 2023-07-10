@@ -8,6 +8,8 @@ public:
     
     bool move= true;
     int cote_droit,cote_gauche;
+    SDL_Color color;
+
     
     block(/* args */);
     ~block();
@@ -27,6 +29,8 @@ class forme
    
 public:
 
+
+
     int x=0,y=0;
 
     char choix_forme[10] = {'L','O','T','Z','S','I'};
@@ -36,13 +40,15 @@ public:
     block liste_block[20];
     
     int indice_tab =0;
-    
-    
-
-
 
     forme();
     ~forme();
+    
+    
+    SDL_Color color;
+
+
+    
 };
 
 forme::forme()
