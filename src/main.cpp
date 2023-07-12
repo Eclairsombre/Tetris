@@ -3,6 +3,8 @@
 using namespace std;
 
 
+#include <string.h>
+
 
 
 #include "../include/class.hpp"
@@ -17,6 +19,7 @@ forme init_forme(forme &f, SDL_Color tab_color[15]);
 void actualiser_forme(forme &f,int vitesse,int &indice,int nb_block[50],block tab_block[1000],SDL_Color tab_color[15],bool &bas);
 void check_colission_plateau(forme &f);
 void check_colision_block(forme &f,block tab_block[1000],int indice,bool &bas);
+void rotation(forme &f);
 
 
 
@@ -106,8 +109,7 @@ while (!close) {
                 switch (event.key.keysym.scancode) {
                     case SDL_SCANCODE_W:
                     case SDL_SCANCODE_UP:
-                    for (int i=0;i<=f.indice_tab;i++)
-                        {f.liste_block[i].dest.y -= 30;}
+                        rotation(f);
                         
                         break;
                     case SDL_SCANCODE_A:
@@ -360,6 +362,12 @@ forme init_forme(forme &f, SDL_Color tab_color[15])
         f.liste_block[2]= g3;
         f.liste_block[3]= m3;
 
+       
+        strcpy(f.liste_block[0].emplacement, "g1");
+        strcpy(f.liste_block[1].emplacement,"g2");
+        strcpy(f.liste_block[2].emplacement, "g3");
+        strcpy(f.liste_block[3].emplacement, "m3");
+
 
         f.liste_block[0].cote_droit = 2;
         f.liste_block[0].cote_gauche = 0;
@@ -400,6 +408,12 @@ forme init_forme(forme &f, SDL_Color tab_color[15])
         f.liste_block[2]= m1;
         f.liste_block[3]= m2;
 
+
+        strcpy(f.liste_block[0].emplacement, "g1");
+        strcpy(f.liste_block[1].emplacement,"g2");
+        strcpy(f.liste_block[2].emplacement, "m1");
+        strcpy(f.liste_block[3].emplacement, "m2");
+
         f.liste_block[0].cote_droit = 2;
         f.liste_block[0].cote_gauche = 0;
         f.liste_block[1].cote_droit = 2;
@@ -438,6 +452,11 @@ forme init_forme(forme &f, SDL_Color tab_color[15])
         f.liste_block[1]= d1;
         f.liste_block[2]= m1;
         f.liste_block[3]= m2;
+
+        strcpy(f.liste_block[0].emplacement, "g1");
+        strcpy(f.liste_block[1].emplacement,"d1");
+        strcpy(f.liste_block[2].emplacement, "m1");
+        strcpy(f.liste_block[3].emplacement, "m2");
 
         f.liste_block[0].cote_droit = 3;
         f.liste_block[0].cote_gauche = 0;
@@ -479,6 +498,12 @@ forme init_forme(forme &f, SDL_Color tab_color[15])
         f.liste_block[2]= m3;
         f.liste_block[3]= m2;
 
+      
+        strcpy(f.liste_block[0].emplacement, "g1");
+        strcpy(f.liste_block[1].emplacement,"g2");
+        strcpy(f.liste_block[2].emplacement, "m3");
+        strcpy(f.liste_block[3].emplacement, "m2");
+
         f.liste_block[0].cote_droit = 2;
         f.liste_block[0].cote_gauche = 0;
         f.liste_block[1].cote_droit = 2;
@@ -518,6 +543,12 @@ forme init_forme(forme &f, SDL_Color tab_color[15])
         f.liste_block[2]= m3;
         f.liste_block[3]= m2;
 
+
+        strcpy(f.liste_block[0].emplacement, "d2");
+        strcpy(f.liste_block[1].emplacement,"d1");
+        strcpy(f.liste_block[2].emplacement, "m3");
+        strcpy(f.liste_block[3].emplacement, "m2");
+
         f.liste_block[0].cote_droit = 1;
         f.liste_block[0].cote_gauche = 1;
         f.liste_block[1].cote_droit = 1;
@@ -537,21 +568,26 @@ forme init_forme(forme &f, SDL_Color tab_color[15])
         m1.dest.x = 400;
         m1.dest.y = 150;
 
-        
+        m2.dest.w = 30;
+        m2.dest.h = 30;
+        m2.dest.x = 400;
+        m2.dest.y = 180;
 
         m3.dest.w = 30;
         m3.dest.h = 30;
         m3.dest.x = 400;
         m3.dest.y = 210;
 
-        m2.dest.w = 30;
-        m2.dest.h = 30;
-        m2.dest.x = 400;
-        m2.dest.y = 180;
+        
         
         f.liste_block[0]= m1;
         f.liste_block[1]= m2;
         f.liste_block[2]= m3;
+        
+        strcpy(f.liste_block[0].emplacement, "m1");
+        strcpy(f.liste_block[1].emplacement,"m2");
+        strcpy(f.liste_block[2].emplacement, "m3");
+        
 
         f.liste_block[0].cote_droit = 1;
         f.liste_block[0].cote_gauche = 0;
@@ -651,6 +687,7 @@ void check_colision_block(forme &f,block tab_block[1000],int indice,bool &bas)
                 
                 
             }
+            /*
             f.liste_block[i].dest.y+=30;
             if (check_collision(f.liste_block[i].dest,tab_block[y].dest)==true)
             {
@@ -659,7 +696,7 @@ void check_colision_block(forme &f,block tab_block[1000],int indice,bool &bas)
                 
             }
             
-            f.liste_block[i].dest.y-=30;
+            f.liste_block[i].dest.y-=30; */
 
         }
     }
@@ -671,3 +708,95 @@ void check_colision_block(forme &f,block tab_block[1000],int indice,bool &bas)
         }
     }
 }
+
+
+void rotation(forme &f)
+{
+        
+        if (f.lettre != 'O')
+        {
+            for (int i=0;i<=f.indice_tab;i++)
+            {
+                
+                if (strcmp(f.liste_block[i].emplacement, "g0") == true)
+                {
+                   
+                    f.liste_block[i].dest.x += 60;
+                    strcpy(f.liste_block[i].emplacement, "d1");
+                    
+                }
+
+
+                else if (strcmp(f.liste_block[i].emplacement , "m0")== true)
+                    {
+                   
+                    f.liste_block[i].dest.x += 30;
+                    f.liste_block[i].dest.y += 30;
+                    strcpy(f.liste_block[i].emplacement, "d2");
+                    
+                    }
+                    
+
+                else if (strcmp(f.liste_block[i].emplacement , "d0")== true)
+                    {
+                        
+                    
+                    f.liste_block[i].dest.y += 60;
+                    strcpy(f.liste_block[i].emplacement, "d3");
+                    }
+                   
+
+                else if (strcmp(f.liste_block[i].emplacement , "g1")== true)
+                    {
+                    
+                    f.liste_block[i].dest.x += 30;
+                    f.liste_block[i].dest.y -= 30;
+                    strcpy(f.liste_block[i].emplacement, "m1");
+                   }
+
+                else if (strcmp(f.liste_block[i].emplacement , "d1")== true)
+                    {
+          
+                    f.liste_block[i].dest.x -= 30;
+                    f.liste_block[i].dest.y += 30;
+                    strcpy(f.liste_block[i].emplacement, "m3");}
+                    
+                
+
+                else if (strcmp(f.liste_block[i].emplacement , "g2")== true)
+                    
+                    {
+                    
+                    f.liste_block[i].dest.y -= 60;
+                    strcpy(f.liste_block[i].emplacement, "g1");}
+                    
+
+                else if (strcmp(f.liste_block[i].emplacement , "m2")== true)
+                    {
+              
+                    f.liste_block[i].dest.x -= 30;
+                    f.liste_block[i].dest.y -= 30;
+                    strcpy(f.liste_block[i].emplacement, "g2");}
+                    
+
+                else if (strcmp(f.liste_block[i].emplacement , "d2")== true)
+                   { 
+           
+                    f.liste_block[i].dest.x -= 60;
+                   strcpy(f.liste_block[i].emplacement, "g3");}
+                    
+                   
+                
+                }
+               
+
+            }
+}
+            
+            
+
+            
+        
+        
+
+    

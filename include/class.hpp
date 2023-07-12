@@ -10,7 +10,8 @@ public:
     int cote_droit,cote_gauche;
     SDL_Color color;
 
-    
+    char emplacement[10];
+
     block(/* args */);
     ~block();
 };
@@ -30,7 +31,7 @@ class forme
 public:
 
 
-
+    int rotation = 0;
     int x=0,y=0;
 
     char choix_forme[10] = {'L','O','T','Z','S','I'};
