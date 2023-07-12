@@ -16,12 +16,13 @@ void check_colission_plateau(forme &f);
 void check_colision_block(forme &f, block tab_block[1000], int indice, bool &bas);
 void rotation(forme &f);
 void test_vide(forme &f);
+bool simple_test_colision(forme &f, block tab_block[1000], int indice);
 
 int main(int argc, char *argv[])
 { // Initialise SDL if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { printf("Erreur lors de l'initialisation de SDL: %s\n", SDL_GetError()); return 1; }
 
     srand(time(NULL));
-    SDL_Window *win = SDL_CreateWindow("GAME", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 1000, 0);
+    SDL_Window *win = SDL_CreateWindow("TETRIS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 1000, 0);
 
     Uint32 render_flags = SDL_RENDERER_ACCELERATED;
     SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
@@ -101,25 +102,47 @@ int main(int argc, char *argv[])
                 {
                 case SDL_SCANCODE_W:
                 case SDL_SCANCODE_UP:
+
                     rotation(f);
+                    if (simple_test_colision(f, tab_block, indice) == true)
+                    {
+                        rotation(f);
+                        rotation(f);
+                        rotation(f);
+                    }
 
                     break;
                 case SDL_SCANCODE_A:
                 case SDL_SCANCODE_LEFT:
+
                     for (int i = 0; i <= f.indice_tab; i++)
                     {
                         f.liste_block[i].dest.x -= 30;
                     }
-                    break;
-                case SDL_SCANCODE_S:
-                case SDL_SCANCODE_DOWN:
-                    if (bas == true)
+                    if (simple_test_colision(f, tab_block, indice) == true)
                     {
                         for (int i = 0; i <= f.indice_tab; i++)
                         {
-                            f.liste_block[i].dest.y += 30;
+                            f.liste_block[i].dest.x += 30;
                         }
                     }
+
+                    break;
+                case SDL_SCANCODE_S:
+                case SDL_SCANCODE_DOWN:
+
+                    for (int i = 0; i <= f.indice_tab; i++)
+                    {
+                        f.liste_block[i].dest.y += 30;
+                    }
+                    if (simple_test_colision(f, tab_block, indice) == true)
+                    {
+                        for (int i = 0; i <= f.indice_tab; i++)
+                        {
+                            f.liste_block[i].dest.y -= 30;
+                        }
+                    }
+
                     break;
                 case SDL_SCANCODE_D:
                 case SDL_SCANCODE_RIGHT:
@@ -127,6 +150,14 @@ int main(int argc, char *argv[])
                     {
                         f.liste_block[i].dest.x += 30;
                     }
+                    if (simple_test_colision(f, tab_block, indice) == true)
+                    {
+                        for (int i = 0; i <= f.indice_tab; i++)
+                        {
+                            f.liste_block[i].dest.x -= 30;
+                        }
+                    }
+
                     break;
                 default:
                     break;
@@ -158,18 +189,6 @@ int main(int argc, char *argv[])
 
             SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
             SDL_RenderDrawRect(rend, &tab_block[y].dest);
-
-            if (check_collision(b.dest, tab_block[y].dest) == true)
-            {
-                b.move = false;
-            }
-            b.dest.y += 30;
-            if (check_collision(b.dest, tab_block[y].dest) == true)
-            {
-                bas = false;
-            }
-
-            b.dest.y -= 30;
         }
 
         int ligne = check_ligne(nb_block);
@@ -228,8 +247,8 @@ bool check_collision(SDL_Rect &A, SDL_Rect &B)
     // Calcul les cotes du rectangle A
     leftA = A.x + 3;
     rightA = A.x - 3 + A.w;
-    topA = A.y;
-    bottomA = A.y + A.h;
+    topA = A.y + 3;
+    bottomA = A.y + A.h - 3;
 
     // Calcul les cotes du rectangle B
     leftB = B.x;
@@ -594,7 +613,7 @@ void actualiser_forme(forme &f, int vitesse, int &indice, int nb_block[50], bloc
     {
         if (f.liste_block[i].move == true)
         {
-            f.liste_block[i].dest.y += 0;
+            f.liste_block[i].dest.y += vitesse;
         }
         else
         {
@@ -651,6 +670,21 @@ void check_colission_plateau(forme &f)
     }
 }
 
+bool simple_test_colision(forme &f, block tab_block[1000], int indice)
+{
+    for (int i = 0; i <= f.indice_tab; i++)
+    {
+        for (int y = 0; y <= indice; y++)
+        {
+            if (check_collision(f.liste_block[i].dest, tab_block[y].dest) == true)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void check_colision_block(forme &f, block tab_block[1000], int indice, bool &bas)
 {
     bool test = true;
@@ -662,16 +696,6 @@ void check_colision_block(forme &f, block tab_block[1000], int indice, bool &bas
             {
                 test = false;
             }
-            /*
-            f.liste_block[i].dest.y+=30;
-            if (check_collision(f.liste_block[i].dest,tab_block[y].dest)==true)
-            {
-                bas=false;
-
-
-            }
-
-            f.liste_block[i].dest.y-=30; */
         }
     }
     if (test == false)
