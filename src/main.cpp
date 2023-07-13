@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <iostream>
 using namespace std;
 
@@ -10,16 +11,27 @@ bool check_collision(SDL_Rect &A, SDL_Rect &B);
 int check_ligne(int nb_block[50]);
 void sup_case(int i, int &indice, block tab_block[1000]);
 void draw_forme(forme &f, SDL_Renderer *rend);
-forme init_forme(forme &f, SDL_Color tab_color[15]);
-void actualiser_forme(forme &f, int vitesse, int &indice, int nb_block[50], block tab_block[1000], SDL_Color tab_color[15], bool &bas);
+void init_forme(forme &f, SDL_Color tab_color[15]);
+void actualiser_forme(forme &f, forme &prochain, int vitesse, int &indice, int nb_block[50], block tab_block[1000], SDL_Color tab_color[15], bool &bas);
 void check_colission_plateau(forme &f);
 void check_colision_block(forme &f, block tab_block[1000], int indice, bool &bas);
 void rotation(forme &f);
 void test_vide(forme &f);
 bool simple_test_colision(forme &f, block tab_block[1000], int indice);
+int timer(int avant);
 
 int main(int argc, char *argv[])
-{ // Initialise SDL if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { printf("Erreur lors de l'initialisation de SDL: %s\n", SDL_GetError()); return 1; }
+{
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    {
+        printf("Erreur lors de l'initialisation de SDL: %s\n", SDL_GetError());
+        return 1;
+    }
+    if (TTF_Init() == -1)
+    {
+        printf("TTF_Init: %s\n", TTF_GetError());
+        return 1;
+    }
 
     srand(time(NULL));
     SDL_Window *win = SDL_CreateWindow("TETRIS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 1000, 0);
@@ -27,11 +39,36 @@ int main(int argc, char *argv[])
     Uint32 render_flags = SDL_RENDERER_ACCELERATED;
     SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
 
+    SDL_Color blanc = {255, 255, 255};
+    TTF_Font *dogica = TTF_OpenFont("/home/alex/Bureau/project SDL/font/dogica.ttf", 16);
+
+    SDL_Surface *texte_prochain = TTF_RenderText_Blended(dogica, "Prochain", blanc);
+    TTF_CloseFont(dogica);
+
+    int txtW = 0;
+    int txtH = 0;
+    SDL_Texture *pTextureTxt = SDL_CreateTextureFromSurface(rend, texte_prochain);
+    SDL_FreeSurface(texte_prochain);
+
+    SDL_QueryTexture(pTextureTxt, NULL, NULL, &txtW, &txtH);
+    SDL_Rect t_pro;
+
+    t_pro.x = 590;
+    t_pro.y = 120;
+    t_pro.w = txtW;
+    t_pro.h = txtH;
+
     SDL_Rect plateau;
     plateau.h = 712;
     plateau.w = 303;
     plateau.x = 248;
     plateau.y = 100;
+
+    SDL_Rect rect_prochain;
+    rect_prochain.h = 100;
+    rect_prochain.w = 100;
+    rect_prochain.x = 600;
+    rect_prochain.y = 150;
 
     block b;
     b.dest.w = 30;
@@ -50,6 +87,7 @@ int main(int argc, char *argv[])
     int speed = 300;
 
     forme f;
+    forme prochain;
 
     SDL_Color blue = SDL_Color();
     blue.r = 0;
@@ -85,6 +123,16 @@ int main(int argc, char *argv[])
 
     init_forme(f, tab_color);
 
+    init_forme(prochain, tab_color);
+
+    for (int i = 0; i <= prochain.indice_tab; i++)
+    {
+        prochain.liste_block[i].dest.x += 235;
+        prochain.liste_block[i].dest.y += 5;
+    }
+
+    int avant = 0;
+    int sec = 1;
     while (!close)
     {
 
@@ -159,6 +207,13 @@ int main(int argc, char *argv[])
                     }
 
                     break;
+                case SDL_SCANCODE_SPACE:
+                    for (int i = 1; i < 30; ++i)
+                    {
+                        cout << nb_block[i] << endl;
+                    }
+                    cout << endl;
+                    break;
                 default:
                     break;
                 }
@@ -167,13 +222,20 @@ int main(int argc, char *argv[])
         }
 
         check_colission_plateau(f);
-        actualiser_forme(f, vitesse, indice, nb_block, tab_block, tab_color, bas);
+        actualiser_forme(f, prochain, vitesse, indice, nb_block, tab_block, tab_color, bas);
 
         SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
         SDL_RenderClear(rend);
 
+        SDL_RenderCopy(rend, pTextureTxt, nullptr, &t_pro);
+
         SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
         SDL_RenderDrawRect(rend, &plateau);
+
+        SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+        SDL_RenderDrawRect(rend, &rect_prochain);
+
+        draw_forme(prochain, rend);
 
         draw_forme(f, rend);
 
@@ -201,7 +263,7 @@ int main(int argc, char *argv[])
 
                 if (tab_block[i].nbLigne + 1 < ligne)
                 {
-
+                    nb_block[tab_block[i].nbLigne] -= 1;
                     tab_block[i].nbLigne += 1;
 
                     nb_block[tab_block[i].nbLigne] += 1;
@@ -219,6 +281,7 @@ int main(int argc, char *argv[])
                 else if (tab_block[i].nbLigne + 1 == ligne)
                 {
                     sup_case(i, indice, tab_block);
+                    nb_block[ligne - 1] -= 1;
                     i -= 1;
                     indice -= 1;
                 }
@@ -231,6 +294,8 @@ int main(int argc, char *argv[])
 
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);
+
+    TTF_Quit();
     SDL_Quit();
 
     return 0;
@@ -282,11 +347,11 @@ bool check_collision(SDL_Rect &A, SDL_Rect &B)
 
 int check_ligne(int nb_block[50])
 {
-    for (int i = 1; i < 49; ++i)
+    for (int i = 1; i < 30; ++i)
     {
-        if (nb_block[i] == 10)
+        if (nb_block[i] >= 10)
         {
-            nb_block[i] = 0;
+
             return i + 1;
         }
     }
@@ -314,7 +379,7 @@ void draw_forme(forme &f, SDL_Renderer *rend)
     }
 }
 
-forme init_forme(forme &f, SDL_Color tab_color[15])
+void init_forme(forme &f, SDL_Color tab_color[15])
 {
 
     f.lettre = f.choix_forme[rand() % 6];
@@ -606,7 +671,7 @@ forme init_forme(forme &f, SDL_Color tab_color[15])
     }
 }
 
-void actualiser_forme(forme &f, int vitesse, int &indice, int nb_block[50], block tab_block[1000], SDL_Color tab_color[15], bool &bas)
+void actualiser_forme(forme &f, forme &prochain, int vitesse, int &indice, int nb_block[50], block tab_block[1000], SDL_Color tab_color[15], bool &bas)
 {
     bool new_forme = false;
     for (int i = 0; i <= f.indice_tab; i++)
@@ -629,11 +694,22 @@ void actualiser_forme(forme &f, int vitesse, int &indice, int nb_block[50], bloc
     }
     if (new_forme == true)
     {
+        for (int i = 0; i <= prochain.indice_tab; i++)
+        {
+            prochain.liste_block[i].dest.x -= 235;
+            prochain.liste_block[i].dest.y -= 5;
+        }
         forme g;
-        bas = true;
+
         init_forme(g, tab_color);
 
-        f = g;
+        f = prochain;
+        prochain = g;
+        for (int i = 0; i <= prochain.indice_tab; i++)
+        {
+            prochain.liste_block[i].dest.x += 235;
+            prochain.liste_block[i].dest.y += 5;
+        }
     }
 }
 
@@ -846,5 +922,16 @@ void test_vide(forme &f)
             }
             f.vide = true;
         }
+    }
+}
+
+int timer(int avant)
+{
+    int seconde = SDL_GetTicks() / 1000;
+    if (seconde != avant)
+    {
+
+        cout << seconde << ' ';
+        return seconde;
     }
 }
