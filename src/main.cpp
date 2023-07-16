@@ -926,6 +926,5 @@ void timer(int &minute, int &seconde)
     {
 
         cout << seconde << ' ';
-        
     }
 }
