@@ -18,7 +18,7 @@ void check_colision_block(forme &f, block tab_block[1000], int indice, bool &bas
 void rotation(forme &f);
 void test_vide(forme &f);
 bool simple_test_colision(forme &f, block tab_block[1000], int indice);
-void timer(int &minute, int &seconde);
+void timer(int &heure, int &minute, int &seconde, TTF_Font *dogica, SDL_Color blanc, SDL_Renderer *rend, SDL_Rect t_timer, char time[100]);
 
 int main(int argc, char *argv[])
 {
@@ -41,14 +41,17 @@ int main(int argc, char *argv[])
 
     SDL_Color blanc = {255, 255, 255};
     TTF_Font *dogica = TTF_OpenFont("font/dogica.ttf", 16);
+    if (dogica == NULL)
+    {
+        fprintf(stderr, "Impossible de charger \"dogica.ttf\"");
+        exit(EXIT_FAILURE);
+    }
 
     SDL_Surface *texte_prochain = TTF_RenderText_Blended(dogica, "Prochain", blanc);
-    TTF_CloseFont(dogica);
 
     int txtW = 0;
     int txtH = 0;
     SDL_Texture *pTextureTxt = SDL_CreateTextureFromSurface(rend, texte_prochain);
-    SDL_FreeSurface(texte_prochain);
 
     SDL_QueryTexture(pTextureTxt, NULL, NULL, &txtW, &txtH);
     SDL_Rect t_pro;
@@ -125,8 +128,25 @@ int main(int argc, char *argv[])
         prochain.liste_block[i].dest.y += 35;
     }
 
-    int avant = 0;
-    int sec = 1;
+    int minute = 0, seconde = 0, heure = 0;
+    char time[100];
+    sprintf(time, "Timer : %d : %d : %d", heure, minute, seconde);
+
+    SDL_Surface *texte_timer = TTF_RenderText_Blended(dogica, time, blanc);
+
+    int txtTimerW = 0;
+    int txtTimerH = 0;
+    SDL_Texture *pTextureTxtTimer = SDL_CreateTextureFromSurface(rend, texte_timer);
+    SDL_FreeSurface(texte_timer);
+
+    SDL_QueryTexture(pTextureTxtTimer, NULL, NULL, &txtTimerW, &txtTimerH);
+    SDL_Rect t_timer;
+
+    t_timer.x = 590;
+    t_timer.y = 300;
+    t_timer.w = txtTimerW;
+    t_timer.h = txtTimerH;
+
     while (!close)
     {
 
@@ -229,6 +249,8 @@ int main(int argc, char *argv[])
         SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
         SDL_RenderDrawRect(rend, &rect_prochain);
 
+        timer(heure, minute, seconde, dogica, blanc, rend, t_timer, time);
+
         draw_forme(prochain, rend);
 
         draw_forme(f, rend);
@@ -288,6 +310,7 @@ int main(int argc, char *argv[])
 
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);
+    TTF_CloseFont(dogica);
 
     TTF_Quit();
     SDL_Quit();
@@ -919,12 +942,65 @@ void test_vide(forme &f)
     }
 }
 
-void timer(int &minute, int &seconde)
+void timer(int &heure, int &minute, int &seconde, TTF_Font *dogica, SDL_Color blanc, SDL_Renderer *rend, SDL_Rect t_timer, char time[100])
 {
-    int sec = SDL_GetTicks() / 1000;
-    if (sec != seconde)
-    {
+    seconde = (SDL_GetTicks() / 1000) % 60;
+    minute = ((SDL_GetTicks() / 1000) / 60) % 60;
+    heure = (SDL_GetTicks() / 1000) / 3600;
 
-        cout << seconde << ' ';
+    if (heure < 10)
+    {
+        if (minute < 10)
+        {
+            if (seconde < 10)
+            {
+                sprintf(time, "Timer : 0%d : 0%d : 0%d", heure, minute, seconde);
+            }
+            else
+            {
+                sprintf(time, "Timer : 0%d : 0%d : %d", heure, minute, seconde);
+            }
+        }
+        else
+        {
+            if (seconde < 10)
+            {
+                sprintf(time, "Timer : 0%d : %d : 0%d", heure, minute, seconde);
+            }
+            else
+            {
+                sprintf(time, "Timer : 0%d : %d : %d", heure, minute, seconde);
+            }
+        }
     }
+    else
+    {
+        if (minute < 10)
+        {
+            if (seconde < 10)
+            {
+                sprintf(time, "Timer : %d : 0%d : 0%d", heure, minute, seconde);
+            }
+            else
+            {
+                sprintf(time, "Timer : %d : 0%d : %d", heure, minute, seconde);
+            }
+        }
+        else
+        {
+            if (seconde < 10)
+            {
+                sprintf(time, "Timer : %d : %d : 0%d", heure, minute, seconde);
+            }
+            else
+            {
+                sprintf(time, "Timer : %d : %d : %d", heure, minute, seconde);
+            }
+        }
+    }
+
+    SDL_Surface *texte_timer = TTF_RenderText_Blended(dogica, time, blanc);
+    SDL_Texture *pTextureTxtTimer = SDL_CreateTextureFromSurface(rend, texte_timer);
+    SDL_FreeSurface(texte_timer);
+    SDL_RenderCopy(rend, pTextureTxtTimer, nullptr, &t_timer);
 }
