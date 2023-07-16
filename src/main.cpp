@@ -18,7 +18,7 @@ void check_colision_block(forme &f, block tab_block[1000], int indice, bool &bas
 void rotation(forme &f);
 void test_vide(forme &f);
 bool simple_test_colision(forme &f, block tab_block[1000], int indice);
-int timer(int avant);
+void timer(int &minute, int &seconde);
 
 int main(int argc, char *argv[])
 {
@@ -919,10 +919,10 @@ void test_vide(forme &f)
     }
 }
 
-int timer(int &minute, int &seconde)
+void timer(int &minute, int &seconde)
 {
-    int seconde = SDL_GetTicks() / 1000;
-    if (seconde != avant)
+    int sec = SDL_GetTicks() / 1000;
+    if (sec != seconde)
     {
 
         cout << seconde << ' ';
