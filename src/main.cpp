@@ -70,12 +70,6 @@ int main(int argc, char *argv[])
     rect_prochain.x = 600;
     rect_prochain.y = 150;
 
-    block b;
-    b.dest.w = 30;
-    b.dest.h = 30;
-    b.dest.x = 400;
-    b.dest.y = 150;
-
     int nb_block[50] = {0};
 
     block tab_block[1000];
@@ -128,7 +122,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i <= prochain.indice_tab; i++)
     {
         prochain.liste_block[i].dest.x += 235;
-        prochain.liste_block[i].dest.y += 5;
+        prochain.liste_block[i].dest.y += 35;
     }
 
     int avant = 0;
@@ -255,7 +249,7 @@ int main(int argc, char *argv[])
 
         int ligne = check_ligne(nb_block);
 
-        if (ligne != -1)
+        if (ligne > 2)
         {
 
             for (int i = 0; i <= indice; i++)
@@ -349,9 +343,9 @@ int check_ligne(int nb_block[50])
 {
     for (int i = 1; i < 30; ++i)
     {
-        if (nb_block[i] >= 10)
+        if (nb_block[i] >= 10 && i + 1 != 2)
         {
-
+            cout << i + 1 << ' ';
             return i + 1;
         }
     }
@@ -391,22 +385,22 @@ void init_forme(forme &f, SDL_Color tab_color[15])
         g1.dest.w = 30;
         g1.dest.h = 30;
         g1.dest.x = 370;
-        g1.dest.y = 150;
+        g1.dest.y = 120;
 
         g2.dest.w = 30;
         g2.dest.h = 30;
         g2.dest.x = 370;
-        g2.dest.y = 180;
+        g2.dest.y = 150;
 
         g3.dest.w = 30;
         g3.dest.h = 30;
         g3.dest.x = 370;
-        g3.dest.y = 210;
+        g3.dest.y = 180;
 
         m3.dest.w = 30;
         m3.dest.h = 30;
         m3.dest.x = 400;
-        m3.dest.y = 210;
+        m3.dest.y = 180;
 
         f.liste_block[0] = g1;
         f.liste_block[1] = g2;
@@ -440,22 +434,22 @@ void init_forme(forme &f, SDL_Color tab_color[15])
         g1.dest.w = 30;
         g1.dest.h = 30;
         g1.dest.x = 370;
-        g1.dest.y = 150;
+        g1.dest.y = 120;
 
         m1.dest.w = 30;
         m1.dest.h = 30;
         m1.dest.x = 400;
-        m1.dest.y = 150;
+        m1.dest.y = 120;
 
         g2.dest.w = 30;
         g2.dest.h = 30;
         g2.dest.x = 370;
-        g2.dest.y = 180;
+        g2.dest.y = 150;
 
         m2.dest.w = 30;
         m2.dest.h = 30;
         m2.dest.x = 400;
-        m2.dest.y = 180;
+        m2.dest.y = 150;
 
         f.liste_block[0] = g1;
         f.liste_block[1] = g2;
@@ -489,22 +483,22 @@ void init_forme(forme &f, SDL_Color tab_color[15])
         g1.dest.w = 30;
         g1.dest.h = 30;
         g1.dest.x = 370;
-        g1.dest.y = 150;
+        g1.dest.y = 120;
 
         m1.dest.w = 30;
         m1.dest.h = 30;
         m1.dest.x = 400;
-        m1.dest.y = 150;
+        m1.dest.y = 120;
 
         d1.dest.w = 30;
         d1.dest.h = 30;
         d1.dest.x = 430;
-        d1.dest.y = 150;
+        d1.dest.y = 120;
 
         m2.dest.w = 30;
         m2.dest.h = 30;
         m2.dest.x = 400;
-        m2.dest.y = 180;
+        m2.dest.y = 150;
 
         f.liste_block[0] = g1;
         f.liste_block[1] = d1;
@@ -538,22 +532,22 @@ void init_forme(forme &f, SDL_Color tab_color[15])
         g1.dest.w = 30;
         g1.dest.h = 30;
         g1.dest.x = 370;
-        g1.dest.y = 150;
+        g1.dest.y = 120;
 
         g2.dest.w = 30;
         g2.dest.h = 30;
         g2.dest.x = 370;
-        g2.dest.y = 180;
+        g2.dest.y = 150;
 
         m3.dest.w = 30;
         m3.dest.h = 30;
         m3.dest.x = 400;
-        m3.dest.y = 210;
+        m3.dest.y = 180;
 
         m2.dest.w = 30;
         m2.dest.h = 30;
         m2.dest.x = 400;
-        m2.dest.y = 180;
+        m2.dest.y = 150;
 
         f.liste_block[0] = g1;
         f.liste_block[1] = g2;
@@ -587,22 +581,22 @@ void init_forme(forme &f, SDL_Color tab_color[15])
         d1.dest.w = 30;
         d1.dest.h = 30;
         d1.dest.x = 430;
-        d1.dest.y = 150;
+        d1.dest.y = 120;
 
         d2.dest.w = 30;
         d2.dest.h = 30;
         d2.dest.x = 430;
-        d2.dest.y = 180;
+        d2.dest.y = 150;
 
         m3.dest.w = 30;
         m3.dest.h = 30;
         m3.dest.x = 400;
-        m3.dest.y = 210;
+        m3.dest.y = 180;
 
         m2.dest.w = 30;
         m2.dest.h = 30;
         m2.dest.x = 400;
-        m2.dest.y = 180;
+        m2.dest.y = 150;
 
         f.liste_block[0] = d2;
         f.liste_block[1] = d1;
@@ -636,17 +630,17 @@ void init_forme(forme &f, SDL_Color tab_color[15])
         m1.dest.w = 30;
         m1.dest.h = 30;
         m1.dest.x = 400;
-        m1.dest.y = 150;
+        m1.dest.y = 120;
 
         m2.dest.w = 30;
         m2.dest.h = 30;
         m2.dest.x = 400;
-        m2.dest.y = 180;
+        m2.dest.y = 150;
 
         m3.dest.w = 30;
         m3.dest.h = 30;
         m3.dest.x = 400;
-        m3.dest.y = 210;
+        m3.dest.y = 180;
 
         f.liste_block[0] = m1;
         f.liste_block[1] = m2;
@@ -697,7 +691,7 @@ void actualiser_forme(forme &f, forme &prochain, int vitesse, int &indice, int n
         for (int i = 0; i <= prochain.indice_tab; i++)
         {
             prochain.liste_block[i].dest.x -= 235;
-            prochain.liste_block[i].dest.y -= 5;
+            prochain.liste_block[i].dest.y -= 35;
         }
         forme g;
 
@@ -708,7 +702,7 @@ void actualiser_forme(forme &f, forme &prochain, int vitesse, int &indice, int n
         for (int i = 0; i <= prochain.indice_tab; i++)
         {
             prochain.liste_block[i].dest.x += 235;
-            prochain.liste_block[i].dest.y += 5;
+            prochain.liste_block[i].dest.y += 35;
         }
     }
 }
@@ -925,7 +919,7 @@ void test_vide(forme &f)
     }
 }
 
-int timer(int avant)
+int timer(int &minute, int &seconde)
 {
     int seconde = SDL_GetTicks() / 1000;
     if (seconde != avant)
