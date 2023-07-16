@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
 
     SDL_Color blanc = {255, 255, 255};
-    TTF_Font *dogica = TTF_OpenFont("/home/alex/Bureau/project SDL/font/dogica.ttf", 16);
+    TTF_Font *dogica = TTF_OpenFont("font/dogica.ttf", 16);
 
     SDL_Surface *texte_prochain = TTF_RenderText_Blended(dogica, "Prochain", blanc);
     TTF_CloseFont(dogica);
@@ -926,6 +926,6 @@ void timer(int &minute, int &seconde)
     {
 
         cout << seconde << ' ';
-        return seconde;
+        
     }
 }
