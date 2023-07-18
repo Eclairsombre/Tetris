@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    SDL_Surface *texte_prochain = TTF_RenderText_Blended(dogica, "Prochain", blanc);
+    SDL_Surface *texte_prochain = TTF_RenderText_Blended(dogica, "NEXT", blanc);
 
     int txtW = 0;
     int txtH = 0;
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     SDL_QueryTexture(pTextureTxt, NULL, NULL, &txtW, &txtH);
     SDL_Rect t_pro;
 
-    t_pro.x = 590;
+    t_pro.x = 620;
     t_pro.y = 120;
     t_pro.w = txtW;
     t_pro.h = txtH;
@@ -142,8 +142,8 @@ int main(int argc, char *argv[])
     SDL_QueryTexture(pTextureTxtTimer, NULL, NULL, &txtTimerW, &txtTimerH);
     SDL_Rect t_timer;
 
-    t_timer.x = 590;
-    t_timer.y = 300;
+    t_timer.x = 260;
+    t_timer.y = 50;
     t_timer.w = txtTimerW;
     t_timer.h = txtTimerH;
 
