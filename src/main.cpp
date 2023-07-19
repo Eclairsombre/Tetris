@@ -24,12 +24,118 @@ void timer(int &heure, int &minute, int &seconde, TTF_Font *dogica, SDL_Color bl
 bool verifierEtCreerFichier(const char *nomFichier);
 bool ecrireDansFichier(const char *nomFichier, const char *texte);
 int game();
+int menu();
 
 // Main
 int main(int argc, char *argv[])
 {
+    menu();
+    printf("test");
+    return 0;
+}
 
-    game();
+int menu()
+{
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    {
+        printf("Erreur lors de l'initialisation de SDL: %s\n", SDL_GetError());
+        return 1;
+    }
+    if (TTF_Init() == -1)
+    {
+        printf("TTF_Init: %s\n", TTF_GetError());
+        return 1;
+    }
+    if (Mix_OpenAudio(96000, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) < 0)
+    {
+        SDL_Log("Erreur initialisation SDL_mixer : %s", Mix_GetError());
+        SDL_Quit();
+        return -1;
+    }
+
+    SDL_Window *win = SDL_CreateWindow("TETRIS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 300, 500, 0);
+    Uint32 render_flags = SDL_RENDERER_ACCELERATED;
+    SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
+
+    Mix_Music *musique;
+    musique = Mix_LoadMUS("music/tetris_theme.mp3");
+    Mix_PlayMusic(musique, -1);
+    Mix_VolumeMusic(10);
+    bool close = false;
+
+    SDL_Rect bouton_play;
+    bouton_play.h = 100;
+    bouton_play.w = 200;
+    bouton_play.x = 50;
+    bouton_play.y = 100;
+
+    SDL_Rect bouton_score;
+    bouton_score.h = 100;
+    bouton_score.w = 200;
+    bouton_score.x = 50;
+    bouton_score.y = 225;
+
+    SDL_Rect bouton_about;
+    bouton_about.h = 100;
+    bouton_about.w = 200;
+    bouton_about.x = 50;
+    bouton_about.y = 350;
+
+    SDL_Event event;
+    int mouseX;
+    int mouseY;
+    while (!close)
+    {
+
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+        SDL_RenderClear(rend);
+
+        SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+        SDL_RenderDrawRect(rend, &bouton_play);
+
+        SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+        SDL_RenderDrawRect(rend, &bouton_score);
+
+        SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+        SDL_RenderDrawRect(rend, &bouton_about);
+
+        while (SDL_PollEvent(&event))
+        {
+
+            switch (event.type)
+            {
+            case SDL_QUIT:
+                close = true;
+                SDL_DestroyRenderer(rend);
+                SDL_DestroyWindow(win);
+
+                Mix_FreeMusic(musique);
+                Mix_CloseAudio();
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                mouseX = event.button.x;
+                mouseY = event.button.y;
+                if ((mouseX >= 50 && mouseX <= 250) && (mouseY >= 100 && mouseY <= 200))
+                {
+
+                    close = true;
+                    SDL_DestroyRenderer(rend);
+                    SDL_DestroyWindow(win);
+                    Mix_FreeMusic(musique);
+                    Mix_CloseAudio();
+                    game();
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        SDL_RenderPresent(rend);
+        SDL_Delay(1000 / 60);
+    }
+
+    SDL_Quit();
+    return 0;
 }
 
 bool check_collision(SDL_Rect &A, SDL_Rect &B)
@@ -1016,13 +1122,7 @@ int game()
                     }
 
                     break;
-                case SDL_SCANCODE_SPACE:
-                    for (int i = 1; i < 30; ++i)
-                    {
-                        cout << nb_block[i] << endl;
-                    }
-                    cout << endl;
-                    break;
+
                 default:
                     break;
                 }
@@ -1111,7 +1211,6 @@ int game()
         SDL_RenderPresent(rend);
         SDL_Delay(1000 / 60);
     }
-
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);
     TTF_CloseFont(dogica);
@@ -1119,6 +1218,5 @@ int game()
     Mix_CloseAudio();
     TTF_Quit();
     SDL_Quit();
-
-    return 0;
+    menu();
 }
