@@ -15,11 +15,11 @@ void sup_case(int i, int &indice, block tab_block[1000]);
 void draw_forme(forme &f, SDL_Renderer *rend);
 void init_forme(forme &f, SDL_Color tab_color[15]);
 void actualiser_forme(forme &f, forme &prochain, int vitesse, int &indice, int nb_block[50], block tab_block[1000], SDL_Color tab_color[15], bool &close, int score, char time[100]);
-void check_colission_plateau(forme &f);
-void check_colision_block(forme &f, block tab_block[1000], int indice, bool &bas);
+void check_collision_plateau(forme &f);
+void check_collision_block(forme &f, block tab_block[1000], int indice, bool &bas);
 void rotation(forme &f);
 void test_vide(forme &f);
-bool simple_test_colision(forme &f, block tab_block[1000], int indice);
+bool simple_test_collision(forme &f, block tab_block[1000], int indice);
 void timer(int &heure, int &minute, int &seconde, TTF_Font *dogica, SDL_Color blanc, SDL_Renderer *rend, SDL_Rect t_timer, char time[100]);
 bool verifierEtCreerFichier(const char *nomFichier);
 bool ecrireDansFichier(const char *nomFichier, const char *texte);
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
 int menu()
 {
-
+    // Initialisation
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         printf("Erreur lors de l'initialisation de SDL: %s\n", SDL_GetError());
@@ -58,15 +58,21 @@ int menu()
         return -1;
     }
 
+    // Initialisation window
+
     SDL_Window *win = SDL_CreateWindow("TETRIS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 300, 500, 0);
     Uint32 render_flags = SDL_RENDERER_ACCELERATED;
     SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
+
+    // Initialisation musique
 
     Mix_Music *musique;
     musique = Mix_LoadMUS("music/tetris_theme.mp3");
     Mix_PlayMusic(musique, -1);
     Mix_VolumeMusic(10);
     bool close = false;
+
+    // Initialisation boutons
 
     SDL_Rect bouton_play;
     bouton_play.h = 100;
@@ -136,6 +142,7 @@ int menu()
     while (!close)
     {
 
+        // Draw
         SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
         SDL_RenderClear(rend);
 
@@ -159,6 +166,7 @@ int menu()
             switch (event.type)
             {
             case SDL_QUIT:
+                // Quit
                 close = true;
                 SDL_DestroyRenderer(rend);
                 SDL_DestroyWindow(win);
@@ -171,7 +179,7 @@ int menu()
                 mouseY = event.button.y;
                 if ((mouseX >= 50 && mouseX <= 250) && (mouseY >= 100 && mouseY <= 200))
                 {
-
+                    // Clique play
                     close = true;
                     SDL_DestroyRenderer(rend);
                     SDL_DestroyWindow(win);
@@ -181,6 +189,7 @@ int menu()
                 }
                 else if ((mouseX >= 50 && mouseX <= 250) && (mouseY >= 225 && mouseY <= 325))
                 {
+                    // Clique score
 
                     close = true;
                     SDL_DestroyRenderer(rend);
@@ -191,6 +200,7 @@ int menu()
                 }
                 else if ((mouseX >= 50 && mouseX <= 250) && (mouseY >= 350 && mouseY <= 450))
                 {
+                    // Clique about
 
                     close = true;
                     SDL_DestroyRenderer(rend);
@@ -258,11 +268,12 @@ bool check_collision(SDL_Rect &A, SDL_Rect &B)
 
 int check_ligne(int nb_block[50])
 {
+    // check si une ligne est remplie
     for (int i = 1; i < 30; ++i)
     {
         if (nb_block[i] >= 10 && i + 1 != 2)
         {
-            cout << i + 1 << ' ';
+
             return i + 1;
         }
     }
@@ -271,6 +282,7 @@ int check_ligne(int nb_block[50])
 
 void sup_case(int i, int &indice, block tab_block[1000])
 {
+    // Supprime une case d'un tab de block
     for (int y = i; y <= indice; y++)
     {
         tab_block[y] = tab_block[y + 1];
@@ -279,6 +291,7 @@ void sup_case(int i, int &indice, block tab_block[1000])
 
 void draw_forme(forme &f, SDL_Renderer *rend)
 {
+    // Draw la piece actuelle
 
     for (int i = 0; i <= f.indice_tab; i++)
     {
@@ -292,6 +305,7 @@ void draw_forme(forme &f, SDL_Renderer *rend)
 
 void init_forme(forme &f, SDL_Color tab_color[15])
 {
+    // Initialise la piece actuelle
 
     f.lettre = f.choix_forme[rand() % 6];
     f.color = tab_color[rand() % 5];
@@ -584,6 +598,7 @@ void init_forme(forme &f, SDL_Color tab_color[15])
 
 void actualiser_forme(forme &f, forme &prochain, int vitesse, int &indice, int nb_block[50], block tab_block[1000], SDL_Color tab_color[15], bool &close, int score, char time[100])
 {
+    // Actualise la piece actuelle (gravité, collisions, nouvelle forme, écriture du score dans le fichier score)
     bool new_forme = false;
     for (int i = 0; i <= f.indice_tab; i++)
     {
@@ -647,9 +662,9 @@ void actualiser_forme(forme &f, forme &prochain, int vitesse, int &indice, int n
     }
 }
 
-void check_colission_plateau(forme &f)
+void check_collision_plateau(forme &f)
 {
-
+    // check la collision avec le plateau
     for (int i = 0; i <= f.indice_tab; i++)
     {
 
@@ -680,8 +695,9 @@ void check_colission_plateau(forme &f)
     }
 }
 
-bool simple_test_colision(forme &f, block tab_block[1000], int indice)
+bool simple_test_collision(forme &f, block tab_block[1000], int indice)
 {
+    // test de collisions avec les autres pieces du plateaux sans arreter la piece actuelle
     for (int i = 0; i <= f.indice_tab; i++)
     {
         for (int y = 0; y <= indice; y++)
@@ -695,8 +711,8 @@ bool simple_test_colision(forme &f, block tab_block[1000], int indice)
     return false;
 }
 
-void check_colision_block(forme &f, block tab_block[1000], int indice, bool &bas)
-{
+void check_collision_block(forme &f, block tab_block[1000], int indice, bool &bas)
+{ // test de collisions avec les autres pieces du plateaux et arrete la piece actuelle
     bool test = true;
     for (int i = 0; i <= f.indice_tab; i++)
     {
@@ -719,6 +735,7 @@ void check_colision_block(forme &f, block tab_block[1000], int indice, bool &bas
 
 void rotation(forme &f)
 {
+    // rotation de la piece actuelle
 
     if (f.lettre != 'O')
     {
@@ -825,6 +842,7 @@ void rotation(forme &f)
 
 void test_vide(forme &f)
 {
+    // test le vide de chaque coté des pieces pour actualiser la collision avec le plateau
     bool droite = false, gauche = false;
     if (f.vide == false)
     {
@@ -861,6 +879,7 @@ void test_vide(forme &f)
 
 void timer(int &heure, int &minute, int &seconde, TTF_Font *dogica, SDL_Color blanc, SDL_Renderer *rend, SDL_Rect t_timer, char time[100])
 {
+    // actualise et affiche le timer
     seconde = (SDL_GetTicks() / 1000) % 60;
     minute = ((SDL_GetTicks() / 1000) / 60) % 60;
     heure = (SDL_GetTicks() / 1000) / 3600;
@@ -924,6 +943,7 @@ void timer(int &heure, int &minute, int &seconde, TTF_Font *dogica, SDL_Color bl
 
 bool verifierEtCreerFichier(const char *nomFichier)
 {
+    // vérifie si un fichier existe sinon le créer
     FILE *fichier = fopen(nomFichier, "r");
 
     if (fichier != nullptr)
@@ -949,6 +969,7 @@ bool verifierEtCreerFichier(const char *nomFichier)
 
 bool ecrireDansFichier(const char *nomFichier, const char *texte)
 {
+    // écrit dans un fichier puis va à la ligne
     FILE *fichier = std::fopen(nomFichier, "a");
 
     if (fichier != nullptr)
@@ -965,7 +986,7 @@ bool ecrireDansFichier(const char *nomFichier, const char *texte)
 
 int game()
 {
-
+    // Initialisation SDL
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         printf("Erreur lors de l'initialisation de SDL: %s\n", SDL_GetError());
@@ -985,10 +1006,12 @@ int game()
 
     srand(time(NULL));
 
+    // Initalisation window
     SDL_Window *win = SDL_CreateWindow("TETRIS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1000, 1000, 0);
     Uint32 render_flags = SDL_RENDERER_ACCELERATED;
     SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
 
+    // Initialisation Texte
     SDL_Color blanc = {255, 255, 255};
     TTF_Font *dogica = TTF_OpenFont("font/dogica.ttf", 16);
     if (dogica == NULL)
@@ -1019,19 +1042,7 @@ int game()
     rect_prochain.x = 650;
     rect_prochain.y = 150;
 
-    int nb_block[50] = {0};
-
-    block tab_block[1000];
-    int indice = 0;
-
-    int vitesse = 1;
-
-    bool close = false, bas = true;
-    int speed = 300;
-
-    forme f;
-    forme prochain;
-
+    // Initialise couleurs
     SDL_Color blue = SDL_Color();
     blue.r = 0;
     blue.g = 0;
@@ -1070,8 +1081,23 @@ int game()
 
     SDL_Color tab_color[15] = {blue, red, green, orange, yellow, purple};
 
+    // Initialise variable
+    int nb_block[50] = {0};
+
+    block tab_block[1000];
+    int indice = 0;
+
+    int vitesse = 1;
+
+    bool close = false, bas = true;
+    int speed = 300;
+
+    forme f;
+    forme prochain;
+
     init_forme(f, tab_color);
 
+    // Initialise prochaine pièce
     init_forme(prochain, tab_color);
 
     for (int i = 0; i <= prochain.indice_tab; i++)
@@ -1080,6 +1106,7 @@ int game()
         prochain.liste_block[i].dest.y += 35;
     }
 
+    // Initialise timer
     int minute = 0, seconde = 0, heure = 0;
     char time[100];
     sprintf(time, "Timer : %d : %d : %d", heure, minute, seconde);
@@ -1095,6 +1122,7 @@ int game()
     t_timer.w = txtTimerW;
     t_timer.h = txtTimerH;
 
+    // Initialise Score
     int score = 0;
     char sco[100];
     sprintf(sco, "Score: %d ", score);
@@ -1116,6 +1144,7 @@ int game()
     rect_score.w = 200;
     rect_score.h = 50;
 
+    // initialise musique
     Mix_Music *musique;
     musique = Mix_LoadMUS("music/tetris_theme.mp3");
     Mix_PlayMusic(musique, -1);
@@ -1140,7 +1169,7 @@ int game()
                 case SDL_SCANCODE_UP:
 
                     rotation(f);
-                    if (simple_test_colision(f, tab_block, indice) == true)
+                    if (simple_test_collision(f, tab_block, indice) == true)
                     {
                         rotation(f);
                         rotation(f);
@@ -1155,7 +1184,7 @@ int game()
                     {
                         f.liste_block[i].dest.x -= 30;
                     }
-                    if (simple_test_colision(f, tab_block, indice) == true)
+                    if (simple_test_collision(f, tab_block, indice) == true)
                     {
                         for (int i = 0; i <= f.indice_tab; i++)
                         {
@@ -1172,7 +1201,7 @@ int game()
                     {
                         f.liste_block[i].dest.y += 30;
                     }
-                    if (simple_test_colision(f, tab_block, indice) == true)
+                    if (simple_test_collision(f, tab_block, indice) == true)
                     {
                         for (int i = 0; i <= f.indice_tab; i++)
                         {
@@ -1187,7 +1216,7 @@ int game()
                     {
                         f.liste_block[i].dest.x += 30;
                     }
-                    if (simple_test_colision(f, tab_block, indice) == true)
+                    if (simple_test_collision(f, tab_block, indice) == true)
                     {
                         for (int i = 0; i <= f.indice_tab; i++)
                         {
@@ -1204,7 +1233,8 @@ int game()
             }
         }
 
-        check_colission_plateau(f);
+        // Draw
+        check_collision_plateau(f);
         actualiser_forme(f, prochain, vitesse, indice, nb_block, tab_block, tab_color, close, score, time);
 
         SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
@@ -1229,13 +1259,13 @@ int game()
         SDL_RenderCopy(rend, pTextureTxtScore, nullptr, &t_score);
 
         draw_forme(prochain, rend);
-
         draw_forme(f, rend);
 
-        check_colision_block(f, tab_block, indice, bas);
-
+        // Fontions collisions
+        check_collision_block(f, tab_block, indice, bas);
         test_vide(f);
 
+        // Affiche les pieces du plateau
         for (int y = 0; y <= indice; y++)
         {
 
@@ -1245,7 +1275,7 @@ int game()
             SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
             SDL_RenderDrawRect(rend, &tab_block[y].dest);
         }
-
+        // Check si une ligne est pleine
         int ligne = check_ligne(nb_block);
 
         if (ligne > 2)
@@ -1297,7 +1327,8 @@ int game()
 
 void findLineWithLargestNumber(const char *filename, char line[600])
 {
-    FILE *file = std::fopen(filename, "r"); // Open the file in read mode.
+    // trouve le plus grand score dans le fichier score
+    FILE *file = std::fopen(filename, "r");
     if (!file)
     {
         std::perror("Error opening the file.");
@@ -1327,6 +1358,7 @@ void findLineWithLargestNumber(const char *filename, char line[600])
 
 int score()
 {
+    // Initialisation
     verifierEtCreerFichier("files/score.txt");
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
@@ -1344,15 +1376,20 @@ int score()
         SDL_Quit();
         return -1;
     }
+    // Initialisation window
 
     SDL_Window *win = SDL_CreateWindow("TETRIS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 300, 500, 0);
     Uint32 render_flags = SDL_RENDERER_ACCELERATED;
     SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
 
+    // Initialisation musique
+
     Mix_Music *musique;
     musique = Mix_LoadMUS("music/tetris_theme.mp3");
     Mix_PlayMusic(musique, -1);
     Mix_VolumeMusic(10);
+
+    // Initialisation Texte
 
     SDL_Color blanc = {255, 255, 255};
     TTF_Font *dogica = TTF_OpenFont("font/dogica.ttf", 16);
@@ -1536,6 +1573,7 @@ int score()
 
 int about()
 {
+    // Initialisation
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         printf("Erreur lors de l'initialisation de SDL: %s\n", SDL_GetError());
@@ -1552,15 +1590,20 @@ int about()
         SDL_Quit();
         return -1;
     }
+    // Initialisation window
 
     SDL_Window *win = SDL_CreateWindow("TETRIS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 300, 500, 0);
     Uint32 render_flags = SDL_RENDERER_ACCELERATED;
     SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
 
+    // Initialisation musique
+
     Mix_Music *musique;
     musique = Mix_LoadMUS("music/tetris_theme.mp3");
     Mix_PlayMusic(musique, -1);
     Mix_VolumeMusic(10);
+
+    // Initialisation Texte
 
     SDL_Color blanc = {255, 255, 255};
     TTF_Font *dogica = TTF_OpenFont("font/dogica.ttf", 16);
@@ -1594,6 +1637,7 @@ int about()
 
         SDL_RenderCopy(rend, pTextureTxtAbout, nullptr, &t_about);
 
+        // Draw texte
         for (int i = 0; i < 13; ++i)
         {
             if (i == 0)
