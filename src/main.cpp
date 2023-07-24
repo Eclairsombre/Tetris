@@ -25,17 +25,22 @@ bool verifierEtCreerFichier(const char *nomFichier);
 bool ecrireDansFichier(const char *nomFichier, const char *texte);
 int game();
 int menu();
+int score();
+int about();
+void findLineWithLargestNumber(const char *filename, char line[600]);
 
 // Main
 int main(int argc, char *argv[])
 {
+
     menu();
-    printf("test");
+
     return 0;
 }
 
 int menu()
 {
+
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         printf("Erreur lors de l'initialisation de SDL: %s\n", SDL_GetError());
@@ -84,6 +89,50 @@ int menu()
     SDL_Event event;
     int mouseX;
     int mouseY;
+
+    SDL_Color blanc = {255, 255, 255};
+    TTF_Font *dogica = TTF_OpenFont("font/dogica.ttf", 16);
+    if (dogica == NULL)
+    {
+        fprintf(stderr, "Impossible de charger \"dogica.ttf\"");
+        exit(EXIT_FAILURE);
+    }
+    SDL_Surface *texte_play = TTF_RenderText_Blended(dogica, "PLAY", blanc);
+    SDL_Surface *texte_tetris = TTF_RenderText_Blended(dogica, "TETRIS", blanc);
+    SDL_Surface *texte_score = TTF_RenderText_Blended(dogica, "SCORE", blanc);
+    SDL_Surface *texte_about = TTF_RenderText_Blended(dogica, "ABOUT", blanc);
+    int txtW = 0;
+    int txtH = 0;
+    SDL_Texture *pTextureTxtPlay = SDL_CreateTextureFromSurface(rend, texte_play);
+    SDL_Texture *pTextureTxtTetris = SDL_CreateTextureFromSurface(rend, texte_tetris);
+    SDL_Texture *pTextureTxtScore = SDL_CreateTextureFromSurface(rend, texte_score);
+    SDL_Texture *pTextureTxtAbout = SDL_CreateTextureFromSurface(rend, texte_about);
+    SDL_QueryTexture(pTextureTxtPlay, NULL, NULL, &txtW, &txtH);
+    SDL_Rect t_play;
+    t_play.x = 90;
+    t_play.y = 130;
+    t_play.w = txtW + 60;
+    t_play.h = txtH + 20;
+
+    SDL_QueryTexture(pTextureTxtTetris, NULL, NULL, &txtW, &txtH);
+    SDL_Rect t_tetris;
+    t_tetris.x = 45;
+    t_tetris.y = 20;
+    t_tetris.w = txtW + 120;
+    t_tetris.h = txtH + 40;
+    SDL_QueryTexture(pTextureTxtScore, NULL, NULL, &txtW, &txtH);
+    SDL_Rect t_score;
+    t_score.x = 80;
+    t_score.y = 260;
+    t_score.w = txtW + 60;
+    t_score.h = txtH + 20;
+    SDL_QueryTexture(pTextureTxtAbout, NULL, NULL, &txtW, &txtH);
+    SDL_Rect t_about;
+    t_about.x = 80;
+    t_about.y = 380;
+    t_about.w = txtW + 60;
+    t_about.h = txtH + 20;
+
     while (!close)
     {
 
@@ -98,6 +147,11 @@ int menu()
 
         SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
         SDL_RenderDrawRect(rend, &bouton_about);
+
+        SDL_RenderCopy(rend, pTextureTxtPlay, nullptr, &t_play);
+        SDL_RenderCopy(rend, pTextureTxtTetris, nullptr, &t_tetris);
+        SDL_RenderCopy(rend, pTextureTxtScore, nullptr, &t_score);
+        SDL_RenderCopy(rend, pTextureTxtAbout, nullptr, &t_about);
 
         while (SDL_PollEvent(&event))
         {
@@ -124,6 +178,26 @@ int menu()
                     Mix_FreeMusic(musique);
                     Mix_CloseAudio();
                     game();
+                }
+                else if ((mouseX >= 50 && mouseX <= 250) && (mouseY >= 225 && mouseY <= 325))
+                {
+
+                    close = true;
+                    SDL_DestroyRenderer(rend);
+                    SDL_DestroyWindow(win);
+                    Mix_FreeMusic(musique);
+                    Mix_CloseAudio();
+                    score();
+                }
+                else if ((mouseX >= 50 && mouseX <= 250) && (mouseY >= 350 && mouseY <= 450))
+                {
+
+                    close = true;
+                    SDL_DestroyRenderer(rend);
+                    SDL_DestroyWindow(win);
+                    Mix_FreeMusic(musique);
+                    Mix_CloseAudio();
+                    about();
                 }
                 break;
             default:
@@ -559,13 +633,13 @@ void actualiser_forme(forme &f, forme &prochain, int vitesse, int &indice, int n
     }
     if (close == true)
     {
-        cout << " 1";
+
         if (verifierEtCreerFichier("files/score.txt") == true)
         {
 
             char temp[100];
-            sprintf(temp, "%d ", score);
-            printf(temp);
+            sprintf(temp, "%d ,", score);
+
             strcat(temp, time);
 
             ecrireDansFichier("files/score.txt", temp);
@@ -1217,6 +1291,409 @@ int game()
     Mix_FreeMusic(musique);
     Mix_CloseAudio();
     TTF_Quit();
+    SDL_Quit();
+    menu();
+}
+
+void findLineWithLargestNumber(const char *filename, char line[600])
+{
+    FILE *file = std::fopen(filename, "r"); // Open the file in read mode.
+    if (!file)
+    {
+        std::perror("Error opening the file.");
+    }
+
+    char currentLine[256];
+
+    int largestNumber = 0;
+
+    while (std::fgets(currentLine, sizeof(currentLine), file))
+    {
+        int number;
+        char *commaPtr = strchr(currentLine, ',');
+        if (commaPtr && std::sscanf(currentLine, "%d", &number) == 1)
+        {
+
+            if (number > largestNumber)
+            {
+                largestNumber = number;
+                strcpy(line, currentLine);
+            }
+        }
+    }
+
+    std::fclose(file);
+}
+
+int score()
+{
+    verifierEtCreerFichier("files/score.txt");
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    {
+        printf("Erreur lors de l'initialisation de SDL: %s\n", SDL_GetError());
+        return 1;
+    }
+    if (TTF_Init() == -1)
+    {
+        printf("TTF_Init: %s\n", TTF_GetError());
+        return 1;
+    }
+    if (Mix_OpenAudio(96000, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) < 0)
+    {
+        SDL_Log("Erreur initialisation SDL_mixer : %s", Mix_GetError());
+        SDL_Quit();
+        return -1;
+    }
+
+    SDL_Window *win = SDL_CreateWindow("TETRIS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 300, 500, 0);
+    Uint32 render_flags = SDL_RENDERER_ACCELERATED;
+    SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
+
+    Mix_Music *musique;
+    musique = Mix_LoadMUS("music/tetris_theme.mp3");
+    Mix_PlayMusic(musique, -1);
+    Mix_VolumeMusic(10);
+
+    SDL_Color blanc = {255, 255, 255};
+    TTF_Font *dogica = TTF_OpenFont("font/dogica.ttf", 16);
+    if (dogica == NULL)
+    {
+        fprintf(stderr, "Impossible de charger \"dogica.ttf\"");
+        exit(EXIT_FAILURE);
+    }
+
+    SDL_Surface *texte_score = TTF_RenderText_Blended(dogica, "SCORE", blanc);
+
+    int txtW = 0;
+    int txtH = 0;
+
+    SDL_Texture *pTextureTxtScore = SDL_CreateTextureFromSurface(rend, texte_score);
+
+    SDL_QueryTexture(pTextureTxtScore, NULL, NULL, &txtW, &txtH);
+    SDL_Rect t_score;
+    t_score.x = 55;
+    t_score.y = 20;
+    t_score.w = txtW + 120;
+    t_score.h = txtH + 40;
+
+    SDL_Surface *textSurface = nullptr;
+    SDL_Texture *textTexture = nullptr;
+    std::string lineText;
+
+    bool close = false;
+    while (!close)
+    {
+
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+        SDL_RenderClear(rend);
+
+        SDL_RenderCopy(rend, pTextureTxtScore, nullptr, &t_score);
+
+        FILE *f = fopen("files/score.txt", "r");
+
+        // Si le fichier ne peut pas être ouvert, afficher un message d'erreur et quitter
+        if (f == NULL)
+        {
+            printf("Le fichier ne peut pas être ouvert.\n");
+            exit(1);
+        }
+
+        // Créer un pointeur vers la fin du fichier
+        fseek(f, 0, SEEK_END);
+
+        // Obtenir la taille du fichier
+        long taille = ftell(f);
+
+        // Revenir au début du fichier
+        fseek(f, 0, SEEK_SET);
+
+        // Créer un tableau pour stocker les dernières lignes du fichier
+        char lignes[taille][1024];
+
+        // Lire les dernières lignes du fichier dans le tableau
+        int i = 0;
+        while (fgets(lignes[i], 1024, f) != NULL)
+        {
+            i++;
+        }
+
+        // Fermer le fichier
+        fclose(f);
+
+        // Afficher les dernières lignes du fichier
+
+        int j = i - 1;
+
+        // Render 10 lines of text
+        for (int i = 0; i < 13; ++i)
+        {
+            if (i == 0)
+            {
+                std::string lineText = "HIGHSCORE";
+                textSurface = TTF_RenderText_Solid(dogica, lineText.c_str(), blanc);
+                textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                SDL_Rect textRect = {80, 90 + i * 30, textSurface->w, textSurface->h};
+                SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                SDL_FreeSurface(textSurface);
+                SDL_DestroyTexture(textTexture);
+            }
+            else if (i == 1)
+            {
+                char line[600];
+                findLineWithLargestNumber("files/score.txt", line);
+
+                textSurface = TTF_RenderText_Solid(dogica, line, blanc);
+                textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                SDL_Rect textRect = {25, 90 + i * 30, textSurface->w - 150, textSurface->h};
+                SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                SDL_FreeSurface(textSurface);
+                SDL_DestroyTexture(textTexture);
+            }
+            else if (i == 2)
+            {
+
+                std::string lineText = "LAST PLAY";
+                textSurface = TTF_RenderText_Solid(dogica, lineText.c_str(), blanc);
+                textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                SDL_Rect textRect = {80, 90 + i * 30, textSurface->w, textSurface->h};
+                SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                SDL_FreeSurface(textSurface);
+                SDL_DestroyTexture(textTexture);
+            }
+            else if (i > 2)
+            {
+                if (j >= 0)
+                {
+                    if (j < 10)
+                    {
+                        if (10 - j <= 10)
+                        {
+                            std::string lineText = lignes[j];
+
+                            j--;
+
+                            textSurface = TTF_RenderText_Solid(dogica, lineText.c_str(), blanc);
+                            textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                            SDL_Rect textRect = {25, 90 + i * 30, textSurface->w - 150, textSurface->h};
+                            SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                            SDL_FreeSurface(textSurface);
+                            SDL_DestroyTexture(textTexture);
+                        }
+                    }
+                    else
+                    {
+                        std::string lineText = lignes[j];
+
+                        j--;
+
+                        textSurface = TTF_RenderText_Solid(dogica, lineText.c_str(), blanc);
+                        textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                        SDL_Rect textRect = {25, 90 + i * 30, textSurface->w - 150, textSurface->h};
+                        SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                        SDL_FreeSurface(textSurface);
+                        SDL_DestroyTexture(textTexture);
+                    }
+                }
+            }
+        }
+        j = i - 1;
+
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+
+            switch (event.type)
+            {
+            case SDL_QUIT:
+                close = true;
+                break;
+
+            default:
+                break;
+            }
+        }
+        SDL_RenderPresent(rend);
+        SDL_Delay(1000 / 60);
+    }
+
+    SDL_DestroyRenderer(rend);
+    SDL_DestroyWindow(win);
+
+    Mix_CloseAudio();
+    SDL_Quit();
+    menu();
+}
+
+int about()
+{
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+    {
+        printf("Erreur lors de l'initialisation de SDL: %s\n", SDL_GetError());
+        return 1;
+    }
+    if (TTF_Init() == -1)
+    {
+        printf("TTF_Init: %s\n", TTF_GetError());
+        return 1;
+    }
+    if (Mix_OpenAudio(96000, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) < 0)
+    {
+        SDL_Log("Erreur initialisation SDL_mixer : %s", Mix_GetError());
+        SDL_Quit();
+        return -1;
+    }
+
+    SDL_Window *win = SDL_CreateWindow("TETRIS", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 300, 500, 0);
+    Uint32 render_flags = SDL_RENDERER_ACCELERATED;
+    SDL_Renderer *rend = SDL_CreateRenderer(win, -1, render_flags);
+
+    Mix_Music *musique;
+    musique = Mix_LoadMUS("music/tetris_theme.mp3");
+    Mix_PlayMusic(musique, -1);
+    Mix_VolumeMusic(10);
+
+    SDL_Color blanc = {255, 255, 255};
+    TTF_Font *dogica = TTF_OpenFont("font/dogica.ttf", 16);
+    if (dogica == NULL)
+    {
+        fprintf(stderr, "Impossible de charger \"dogica.ttf\"");
+        exit(EXIT_FAILURE);
+    }
+
+    SDL_Surface *texte_about = TTF_RenderText_Blended(dogica, "ABOUT", blanc);
+
+    int txtW = 0;
+    int txtH = 0;
+
+    SDL_Texture *pTextureTxtAbout = SDL_CreateTextureFromSurface(rend, texte_about);
+
+    SDL_QueryTexture(pTextureTxtAbout, NULL, NULL, &txtW, &txtH);
+    SDL_Rect t_about;
+    t_about.x = 55;
+    t_about.y = 20;
+    t_about.w = txtW + 120;
+    t_about.h = txtH + 40;
+    SDL_Surface *textSurface = nullptr;
+    SDL_Texture *textTexture = nullptr;
+    bool close = false;
+    while (!close)
+    {
+
+        SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+        SDL_RenderClear(rend);
+
+        SDL_RenderCopy(rend, pTextureTxtAbout, nullptr, &t_about);
+
+        for (int i = 0; i < 13; ++i)
+        {
+            if (i == 0)
+            {
+                std::string lineText = "MUSIC :";
+                textSurface = TTF_RenderText_Solid(dogica, lineText.c_str(), blanc);
+                textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                SDL_Rect textRect = {10, 110 + i * 30, textSurface->w, textSurface->h};
+                SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                SDL_FreeSurface(textSurface);
+                SDL_DestroyTexture(textTexture);
+            }
+            else if (i == 1)
+            {
+                std::string lineText = "Tetris Theme Song 1 Hour Loop";
+                textSurface = TTF_RenderText_Solid(dogica, lineText.c_str(), blanc);
+                textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                SDL_Rect textRect = {10, 110 + i * 30, textSurface->w - 200, textSurface->h};
+                SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                SDL_FreeSurface(textSurface);
+                SDL_DestroyTexture(textTexture);
+            }
+
+            else if (i == 3)
+            {
+                std::string lineText = "CREATOR :";
+                textSurface = TTF_RenderText_Solid(dogica, lineText.c_str(), blanc);
+                textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                SDL_Rect textRect = {10, 110 + i * 30, textSurface->w, textSurface->h};
+                SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                SDL_FreeSurface(textSurface);
+                SDL_DestroyTexture(textTexture);
+            }
+            else if (i == 4)
+            {
+                std::string lineText = "Eclairsombre";
+                textSurface = TTF_RenderText_Solid(dogica, lineText.c_str(), blanc);
+                textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                SDL_Rect textRect = {10, 110 + i * 30, textSurface->w, textSurface->h};
+                SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                SDL_FreeSurface(textSurface);
+                SDL_DestroyTexture(textTexture);
+            }
+            else if (i == 6)
+            {
+                std::string lineText = "Github :";
+                textSurface = TTF_RenderText_Solid(dogica, lineText.c_str(), blanc);
+                textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                SDL_Rect textRect = {10, 110 + i * 30, textSurface->w, textSurface->h};
+                SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                SDL_FreeSurface(textSurface);
+                SDL_DestroyTexture(textTexture);
+            }
+
+            else if (i == 7)
+            {
+                std::string lineText = "https://github.com/Eclairsombre";
+                textSurface = TTF_RenderText_Solid(dogica, lineText.c_str(), blanc);
+                textTexture = SDL_CreateTextureFromSurface(rend, textSurface);
+
+                SDL_Rect textRect = {10, 110 + i * 30, textSurface->w - 220, textSurface->h};
+                SDL_RenderCopy(rend, textTexture, nullptr, &textRect);
+
+                SDL_FreeSurface(textSurface);
+                SDL_DestroyTexture(textTexture);
+            }
+        }
+
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+
+            switch (event.type)
+            {
+            case SDL_QUIT:
+                close = true;
+                break;
+
+            default:
+                break;
+            }
+        }
+        SDL_RenderPresent(rend);
+        SDL_Delay(1000 / 60);
+    }
+
+    SDL_DestroyRenderer(rend);
+    SDL_DestroyWindow(win);
+
+    Mix_CloseAudio();
     SDL_Quit();
     menu();
 }
