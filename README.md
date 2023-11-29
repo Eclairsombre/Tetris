@@ -53,19 +53,6 @@ Make sure to install SDL2 before building the project.
 - **Right Arrow**: Move piece right
 - **Down Arrow**: Move piece down (faster)
 - **Up Arrow**: Rotate piece
-- **P**: Pause/Resume game
-- **Q**: Quit game
 
-## Screenshots
 
-![Tetris Gameplay](screenshots/gameplay.png)
 
-_Add more screenshots if needed._
-
-## License
-
-This project is licensed under the [MIT License](LICENSE.md).
-
----
-
-Feel free to contribute, report issues, or suggest improvements!
