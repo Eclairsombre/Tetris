@@ -19,7 +19,8 @@ This project relies on the following dependencies:
 
 Make sure to install SDL2 before building the project.
 
-- Dogica font 
+- Dogica font .
+  You can download it directly from the font folder or at https://www.dafont.com/dogica.font .
 
 ## Building
 
