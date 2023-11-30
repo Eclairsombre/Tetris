@@ -55,5 +55,8 @@ Make sure to install SDL2 before building the project.
 - **Down Arrow**: Move piece down (faster)
 - **Up Arrow**: Rotate piece
 
+## Demonstration
+
+![tetris](https://github.com/Eclairsombre/Tetris/assets/130174141/96d4e3fe-cadf-4399-aa3d-11a0ad70c17f)
 
 
